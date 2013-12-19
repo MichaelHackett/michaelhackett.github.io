@@ -9,7 +9,9 @@
   <meta name="author" content="Michael Hackett">
 
   
-  <meta name="description" content=" Blog Archives Recent Posts ">
+  <meta name="description" content="Kiwi is a Behavior-Driven Development (BDD) framework for iOS and
+Mac OS X, for Objective-C code. Its syntax seems to follow
+rSpec&rsquo;s as closely &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -66,6 +68,153 @@
       <div class="blog-index">
   
   
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2013/05/12/kiwi-without-cocoapods/">Using Kiwi BDD Without Cocoapods</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2013-05-12T00:00:00-03:00" pubdate data-updated="true">2013-05-12</time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p><a href="https://github.com/allending/Kiwi">Kiwi</a> is a Behavior-Driven Development (BDD) framework for iOS and
+Mac OS X, for Objective-C code. Its syntax seems to follow
+<a href="http://rspec.info/">rSpec</a>&rsquo;s as closely as Objective-C will allow. I like the way
+it takes advantage of Objective-C&rsquo;s dynamic dispatch features to reduce the
+level of &ldquo;noise&rdquo; in the code, although there are still some awkward aspects
+that I&rsquo;d love to someday clean up with a custom parser. But it&rsquo;ll do for
+now&hellip;</p>
+
+<p>For me, the biggest impediment to getting started with Kiwi was the
+dependency on Cocoapods for installation. I&rsquo;m not keen on adding the Ruby
+dependency for others who may use my projects, and I prefer to include all
+dependencies within project repository, so one can just checkout and build,
+without worrying about library versions and such.</p>
+
+<p>Turns out, the Kiwi project has schemes that can be used to build the
+project as a framework or static library (and also a Makefile to do the
+same job from outside Xcode). I had to make a few repairs to the
+configuration to bring it up to date (now incorporated into the main
+codebase), but I was able to build a static framework package for iOS and
+incorporate it into my own project, using the steps below:</p>
+
+<h2>Building Kiwi</h2>
+
+<p><strong>Step 1.</strong> Clone the Kiwi Git repository: <a href="https://github.com/allending/Kiwi.git">https://github.com/allending/Kiwi.git</a></p>
+
+<p><strong>Step 2.</strong> In Xcode, open the Kiwi project and choose the <strong>Kiwi-iOS</strong> scheme.</p>
+
+<p><strong>Step 3.</strong> Choose whether you want to make a Debug or Release build.</p>
+
+<p>  Since Kiwi is only to be used for development purposes, I can&rsquo;t foresee a
+  need for a Release build, unless perhaps your tests are running too
+  slowly. In any case, to choose, Edit the <em>Kiwi-iOS</em> scheme and in the
+  <strong>Run</strong> panel (left-hand side tabs), select the <strong>Info</strong> tab and choose
+  the <strong>Build Configuration</strong> (<em>Debug</em> or <em>Release</em>).</p>
+
+<p><strong>Step 4.</strong> Do a straight build (<strong>Product > Build</strong> or <strong>&#8984;-B</strong>) of
+  the project.</p>
+
+<p>When the build is complete (if successful), a Finder window will open,
+showing you the final location of the built framework. (If you lose the
+window, look for a <em>Kiwi-xxxx/Build/Products/Debug-iphoneuniversal</em>
+directory (or <em>Release-iphoneuniversal</em>), in your Xcode <em>Derived Data</em>
+directory.)</p>
+
+<h2>Using Kiwi in a project</h2>
+
+<p>Here is the process if, like me, you want to include the library and
+headers within your project&rsquo;s workspace. Modify as necessary if you prefer
+to keep the framework in a global location and link to it from the project.</p>
+
+<p><strong>Step 1.</strong> Copy the <em>Kiwi.framework</em> folder into your project somewhere.</p>
+
+<p>  I keep dependencies in a top-level directory called <em>Libraries</em>; adapt the
+  paths in the following steps as necessary for your own arrangement.</p>
+
+<p><strong>Step 2.</strong> If necessary, add a test target to the project.</p>
+
+<p>  If you don&rsquo;t already have a test target, add one to the project. <strong>File >
+  New > Target&hellip;</strong>, then <strong>Other > Cocoa Touch Unit Testing Bundle</strong> and
+  fill in the Product name and other fields on the final screen.</p>
+
+<p><strong>Step 3.</strong> Add the library to the project&rsquo;s link phase.</p>
+
+<ol type="a">
+<li> From the Project Navigator (<strong>&#8984;-1</strong>), select the project to
+ contain your Kiwi specs.</li>
+<li> In the project configuration editor, select the test target, then
+ its <strong>Build Phases</strong> tab.</li>
+<li> Expand the <strong>Link Binary With Libraries</strong> section and click the add
+ (&ldquo;<strong>+</strong>&rdquo;) button.</li>
+<li> Click <strong>Add Other&hellip;</strong> and locate the <strong>Kiwi.Framework</strong> folder.
+ Select it and click <strong>Open</strong>.</li>
+</ol>
+
+
+<p><strong>Step 4.</strong> Add <strong>-ObjC</strong> to the <strong>Other Linker Flags</strong> setting
+  (<strong>OTHER_LDFLAGS</strong>, if showing setting names) for the target.</p>
+
+<ol type="a">
+<li> Switch to the <strong>Build Settings</strong> tab of the project configuration
+ editor.</li>
+<li> Enter &ldquo;Other Linker&rdquo; (or &ldquo;LDFLAGS&rdquo;) in the search field at the top.</li>
+<li> Double-click in the column for the target and then click the &ldquo;+&rdquo;
+ button and enter &ldquo;-ObjC&rdquo;. (Or click once and add &ldquo;-ObjC&rdquo; to the
+ setting string.)</li>
+</ol>
+
+
+<p>  Reportedly, prior to Xcode 4.5, you may also need to specify the
+  <strong>-all_load</strong> linker flag. Try without and, if you get link errors, add
+  it as above.</p>
+
+<h2>Additional Notes</h2>
+
+<p>One other point: If you are using the Kiwi Spec template that is included
+with the Kiwi source, change the <strong>#import</strong> path for Kiwi from &ldquo;Kiwi.h&rdquo;
+to:</p>
+
+<pre><code>#import &lt;Kiwi/Kiwi.h&gt;
+</code></pre>
+
+<p>Oh, and, actually, one more point: The Kiwi import should come last to
+avoid name clashes between Kiwi&rsquo;s macros and certain definitions in Apple&rsquo;s
+(and perhaps your own) headers. That&rsquo;s why it&rsquo;s probably not a good idea to
+place the Kiwi header in a pre-compiled header, although it may be safe as
+long as it follows all Apple&rsquo;s headers and none of your project&rsquo;s headers
+have any conflicts, or if you also include your project&rsquo;s headers in the
+PCH.</p>
+
+<h2>Update</h2>
+
+<p>There is now a <a href="https://github.com/allending/Kiwi/wiki/Setting-Up-Kiwi-2.x-without-CocoaPods">wiki page on the Kiwi GitHub site covering this</a>, to which I have contributed.</p>
+</div>
+  
+  
+
+
+    </article>
+  
   <div class="pagination">
     
     <a href="/blog/archives">Blog Archives</a>
@@ -77,6 +226,10 @@
     <section>
   <h1>Recent Posts</h1>
   <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="/blog/2013/05/12/kiwi-without-cocoapods/">Using Kiwi BDD Without Cocoapods</a>
+      </li>
     
   </ul>
 </section>

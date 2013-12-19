@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <feed xmlns="http://www.w3.org/2005/Atom">
 
-  <title><![CDATA[Crunchy Blog]]></title>
-  <link href="http://michaelhackett.github.io/atom.xml" rel="self"/>
+  <title><![CDATA[Category: BDD, | Crunchy Blog]]></title>
+  <link href="http://michaelhackett.github.io/blog/categories/bdd/atom.xml" rel="self"/>
   <link href="http://michaelhackett.github.io/"/>
   <updated>2013-12-18T22:40:25-04:00</updated>
   <id>http://michaelhackett.github.io/</id>
