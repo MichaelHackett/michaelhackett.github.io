@@ -1,0 +1,4 @@
+User-agent: *
+Disallow: 
+
+Sitemap: http://michaelhackett.github.io/sitemap.xml 
